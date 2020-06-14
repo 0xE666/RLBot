@@ -29,10 +29,11 @@ async def help(ctx):
 
         embed = discord.Embed(title="RLBot help", colour=discord.Colour(0x1406EF))
         embed.set_footer(text="e:)")
-        embed.add_field(name="**$Rank** (Check all ranks)", value="**Rank Steam {ID}\n Rank PS4 {PSN}\n Rank XBOX {gamertag}**", inline=False)
-        embed.add_field(name="**$Duel** (Check 1v1 rank)", value="**Duel Steam {ID}\n Duel PS4 {PSN}\n Duel XBOX {gamertag}**", inline=False)
-        embed.add_field(name="**$Doubles** (Check 2v2 rank)", value="**Doubles Steam {ID}\n Doubles PS4 {PSN}\n Doubles XBOX {gamertag}**", inline=False)
-        embed.add_field(name="**$Standard** (Check 3v3 rank)", value="**Standard Steam {ID}\n Standard PS4 {PSN}\n Standard XBOX {gamertag}**", inline=False)
+        embed.add_field(name="**$Rank** (Check all ranks)", value="**Rank Steam {ID}\nRank PS4 {PSN}\nRank XBOX {gamertag}\n**", inline=True)
+        embed.add_field(name="**$Feed** (Lastest Stats)", value="**Feed Steam {ID}\nFeed PS4 {PSN}\nFeed XBOX {gamertag}\n**", inline=True)
+        embed.add_field(name="**$Duel** (Check 1v1 rank)", value="**Duel Steam {ID}\nDuel PS4 {PSN}\nDuel XBOX {gamertag}\n**", inline=True)
+        embed.add_field(name="**$Doubles** (Check 2v2 rank)", value="**Doubles Steam {ID}\nDoubles PS4 {PSN}\nDoubles XBOX {gamertag}\n**", inline=True)
+        embed.add_field(name="**$Standard** (Check 3v3 rank)", value="**Standard Steam {ID}\nStandard PS4 {PSN}\nStandard XBOX {gamertag}\n**", inline=True)
         await ctx.send(embed=embed)
 
 def playerid(platform, player):
@@ -86,14 +87,14 @@ async def rank(ctx, platform, player):
 
         embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
         embed.set_author(name="RLBot")
-        embed.add_field(name="**Duel**", value=f"{duelRank} \n MMR: {duelMMR} \n Streak: {duelStreak}", inline=False)
-        embed.add_field(name="**Doubles**", value=f"{doublesRank} \n MMR: {doublesMMR} \n Streak: {doublesStreak}", inline=False)
-        embed.add_field(name="**Standard**", value=f"{standardRank} \n MMR: {standardMMR} \n Streak: {standardStreak}", inline=False)
-        embed.add_field(name="**Solo Standard**", value=f"{solostandardRank} \n MMR: {solostandardMMR} \n Streak: {solostandardStreak}", inline=False)
-        embed.add_field(name="**Hoops**", value=f"{hoopsRank} \n MMR: {hoopsMMR}", inline=False)
-        embed.add_field(name="**Rumble**", value=f"{rumbleRank} \n MMR: {rumbleMMR}", inline=False)
-        embed.add_field(name="**Dropshot**", value=f"{dropshotRank} \n MMR: {dropshotMMR}", inline=False)
-        embed.add_field(name="**Snowday**", value=f"{snowdayRank} \n MMR: {snowdayMMR}", inline=False)
+        embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
+        embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
+        embed.add_field(name="**Standard**", value=f"{standardRank} \nMMR: {standardMMR} \nStreak: {standardStreak}", inline=False)
+        embed.add_field(name="**Solo Standard**", value=f"{solostandardRank} \nMMR: {solostandardMMR} \nStreak: {solostandardStreak}", inline=False)
+        embed.add_field(name="**Hoops**", value=f"{hoopsRank} \nMMR: {hoopsMMR}", inline=False)
+        embed.add_field(name="**Rumble**", value=f"{rumbleRank} \nMMR: {rumbleMMR}", inline=False)
+        embed.add_field(name="**Dropshot**", value=f"{dropshotRank} \nMMR: {dropshotMMR}", inline=False)
+        embed.add_field(name="**Snowday**", value=f"{snowdayRank} \nMMR: {snowdayMMR}", inline=False)
         embed.set_footer(text="e:)")
 
         await ctx.send(embed=embed)
@@ -124,10 +125,10 @@ async def rank(ctx, platform, player):
 
             embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
             embed.set_author(name="RLBot")
-            embed.add_field(name="**Duel**", value=f"{duelRank} \n MMR: {duelMMR} \n Streak: {duelStreak}", inline=False)
-            embed.add_field(name="**Doubles**", value=f"{doublesRank} \n MMR: {doublesMMR} \n Streak: {doublesStreak}", inline=False)
-            embed.add_field(name="**Standard**", value=f"{standardRank} \n MMR: {standardMMR} \n Streak: {standardStreak}", inline=False)
-            embed.add_field(name="**Solo Standard**", value=f"{solostandardRank} \n MMR: {solostandardMMR} \n Streak: {solostandardStreak}", inline=False)
+            embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
+            embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
+            embed.add_field(name="**Standard**", value=f"{standardRank} \nMMR: {standardMMR} \nStreak: {standardStreak}", inline=False)
+            embed.add_field(name="**Solo Standard**", value=f"{solostandardRank} \nMMR: {solostandardMMR} \nStreak: {solostandardStreak}", inline=False)
             embed.set_footer(text="e:)")
 
             await ctx.send(embed=embed)
@@ -179,7 +180,7 @@ async def duel(ctx, platform, player):
 
         embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
         embed.set_author(name="RLBot")
-        embed.add_field(name="**Duel**", value=f"{duelRank} \n MMR: {duelMMR} \n Streak: {duelStreak}", inline=False)
+        embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
         embed.set_footer(text="e:)")
 
         await ctx.send(embed=embed)
@@ -210,7 +211,7 @@ async def duel(ctx, platform, player):
 
             embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
             embed.set_author(name="RLBot")
-            embed.add_field(name="**Duel**", value=f"{duelRank} \n MMR: {duelMMR} \n Streak: {duelStreak}", inline=False)
+            embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
             embed.set_footer(text="e:)")
 
             await ctx.send(embed=embed)
@@ -262,7 +263,7 @@ async def doubles(ctx, platform, player):
 
         embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
         embed.set_author(name="RLBot")
-        embed.add_field(name="**Doubles**", value=f"{doublesRank} \n MMR: {doublesMMR} \n Streak: {doublesStreak}", inline=False)
+        embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
         embed.set_footer(text="e:)")
 
         await ctx.send(embed=embed)
@@ -293,7 +294,7 @@ async def doubles(ctx, platform, player):
 
             embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
             embed.set_author(name="RLBot")
-            embed.add_field(name="**Doubles**", value=f"{doublesRank} \n MMR: {doublesMMR} \n Streak: {doublesStreak}", inline=False)
+            embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
             embed.set_footer(text="e:)")
 
             await ctx.send(embed=embed)
@@ -345,7 +346,7 @@ async def standard(ctx, platform, player):
 
         embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
         embed.set_author(name="RLBot")
-        embed.add_field(name="**Standard**", value=f"{standardRank} \n MMR: {standardMMR} \n Streak: {standardStreak}", inline=False)
+        embed.add_field(name="**Standard**", value=f"{standardRank} \nMMR: {standardMMR} \nStreak: {standardStreak}", inline=False)
         embed.set_footer(text="e:)")
 
         await ctx.send(embed=embed)
@@ -376,7 +377,7 @@ async def standard(ctx, platform, player):
 
             embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
             embed.set_author(name="RLBot")
-            embed.add_field(name="**Standard**", value=f"{standardRank} \n MMR: {standardMMR} \n Streak: {standardStreak}", inline=False)
+            embed.add_field(name="**Standard**", value=f"{standardRank} \nMMR: {standardMMR} \nStreak: {standardStreak}", inline=False)
             embed.set_footer(text="e:)")
 
             await ctx.send(embed=embed)
@@ -384,4 +385,137 @@ async def standard(ctx, platform, player):
         except Exception as ex:
             await ctx.send(f"Error Code: {ex}")
 
-bot.run('NzEwNTE2NjcxMTg5NzQ1Njgz.XsQ7GQ.VnSZ_ZEBeWQ0Q65wQMGMnWOfNEo')
+
+@bot.command()
+async def feed(ctx, platform, player):
+
+    player_id = playerid(platform, player)
+    live_url = 'https://rocketleague.tracker.network/live/data'
+    data = json.dumps({'playerIds': [player_id]})
+    live_data = requests.post(live_url, data=data).json()
+
+    try:
+
+        mode0 = live_data['feed'][0]['Changes'][-1]['Field']
+        mmr0 = live_data['feed'][0]['Changes'][-1]['Value']
+        change0 = live_data['feed'][0]['Changes'][-1]['Delta']
+        message0 = live_data['feed'][0]['Changes'][-1]['Message']
+
+
+        mode1 = live_data['feed'][1]['Changes'][-1]['Field']
+        mmr1 = live_data['feed'][1]['Changes'][-1]['Value']
+        change1 = live_data['feed'][1]['Changes'][-1]['Delta']
+        message1 = live_data['feed'][1]['Changes'][-1]['Message']
+
+        mode2 = live_data['feed'][2]['Changes'][-1]['Field']
+        mmr2 = live_data['feed'][2]['Changes'][-1]['Value']
+        change2 = live_data['feed'][2]['Changes'][-1]['Delta']
+        message2 = live_data['feed'][2]['Changes'][-1]['Message']
+
+        mode3 = live_data['feed'][3]['Changes'][-1]['Field']
+        mmr3 = live_data['feed'][3]['Changes'][-1]['Value']
+        change3 = live_data['feed'][3]['Changes'][-1]['Delta']
+        message3 = live_data['feed'][3]['Changes'][-1]['Message']
+
+        mode4 = live_data['feed'][4]['Changes'][-1]['Field']
+        mmr4 = live_data['feed'][4]['Changes'][-1]['Value']
+        change4 = live_data['feed'][4]['Changes'][-1]['Delta']
+        message4 = live_data['feed'][4]['Changes'][-1]['Message']
+
+        mode5 = live_data['feed'][5]['Changes'][-1]['Field']
+        mmr5 = live_data['feed'][5]['Changes'][-1]['Value']
+        change5 = live_data['feed'][5]['Changes'][-1]['Delta']
+        message5 = live_data['feed'][5]['Changes'][-1]['Message']
+
+        mode6 = live_data['feed'][6]['Changes'][-1]['Field']
+        mmr6 = live_data['feed'][6]['Changes'][-1]['Value']
+        change6 = live_data['feed'][6]['Changes'][-1]['Delta']
+        message6 = live_data['feed'][6]['Changes'][-1]['Message']
+
+        mode7 = live_data['feed'][7]['Changes'][-1]['Field']
+        mmr7 = live_data['feed'][7]['Changes'][-1]['Value']
+        change7 = live_data['feed'][7]['Changes'][-1]['Delta']
+        message7 = live_data['feed'][7]['Changes'][-1]['Message']
+
+
+        embed=discord.Embed(title=f"{player} lastest stats", color=0x021ff7)
+        embed.set_author(name="RLBot")
+        embed.add_field(name="**Feed**",
+                            value=f"{mode0} \nMMR: {mmr0} \nMMR Change: {change0} \nMessage: {message0}\n\n" \
+                                + f"{mode1} \nMMR: {mmr1} \nMMR Change: {change1} \nMessage: {message1}\n\n" \
+                                + f"{mode2} \nMMR: {mmr2} \nMMR Change: {change2} \nMessage: {message2}\n\n" \
+                                + f"{mode3} \nMMR: {mmr3} \nMMR Change: {change3} \nMessage: {message3}\n\n" \
+                                + f"{mode4} \nMMR: {mmr4} \nMMR Change: {change4} \nMessage: {message4}\n\n" \
+                                + f"{mode5} \nMMR: {mmr5} \nMMR Change: {change5} \nMessage: {message5}\n\n" \
+                                + f"{mode6} \nMMR: {mmr6} \nMMR Change: {change6} \nMessage: {message6}\n\n" \
+                                + f"{mode7} \nMMR: {mmr7} \nMMR Change: {change7} \nMessage: {message7}\n\n" ,
+                            inline=False)
+        embed.set_footer(text="e:)")
+
+        await ctx.send(embed=embed)
+
+    except:
+
+        try:
+
+            mode0 = live_data['feed'][0]['Changes'][-1]['Field']
+            mmr0 = live_data['feed'][0]['Changes'][-1]['Value']
+            change0 = live_data['feed'][0]['Changes'][-1]['Delta']
+            message0 = live_data['feed'][0]['Changes'][-1]['Message']
+
+            mode1 = live_data['feed'][1]['Changes'][-1]['Field']
+            mmr1 = live_data['feed'][1]['Changes'][-1]['Value']
+            change1 = live_data['feed'][1]['Changes'][-1]['Delta']
+            message1 = live_data['feed'][1]['Changes'][-1]['Message']
+
+            mode2 = live_data['feed'][2]['Changes'][-1]['Field']
+            mmr2 = live_data['feed'][2]['Changes'][-1]['Value']
+            change2 = live_data['feed'][2]['Changes'][-1]['Delta']
+            message2 = live_data['feed'][2]['Changes'][-1]['Message']
+
+            mode3 = live_data['feed'][3]['Changes'][-1]['Field']
+            mmr3 = live_data['feed'][3]['Changes'][-1]['Value']
+            change3 = live_data['feed'][3]['Changes'][-1]['Delta']
+            message3 = live_data['feed'][3]['Changes'][-1]['Message']
+
+            mode4 = live_data['feed'][4]['Changes'][-1]['Field']
+            mmr4 = live_data['feed'][4]['Changes'][-1]['Value']
+            change4 = live_data['feed'][4]['Changes'][-1]['Delta']
+            message4 = live_data['feed'][4]['Changes'][-1]['Message']
+
+            mode5 = live_data['feed'][5]['Changes'][-1]['Field']
+            mmr5 = live_data['feed'][5]['Changes'][-1]['Value']
+            change5 = live_data['feed'][5]['Changes'][-1]['Delta']
+            message5 = live_data['feed'][5]['Changes'][-1]['Message']
+
+            mode6 = live_data['feed'][6]['Changes'][-1]['Field']
+            mmr6 = live_data['feed'][6]['Changes'][-1]['Value']
+            change6 = live_data['feed'][6]['Changes'][-1]['Delta']
+            message6 = live_data['feed'][6]['Changes'][-1]['Message']
+
+            mode7 = live_data['feed'][7]['Changes'][-1]['Field']
+            mmr7 = live_data['feed'][7]['Changes'][-1]['Value']
+            change7 = live_data['feed'][7]['Changes'][-1]['Delta']
+            message7 = live_data['feed'][7]['Changes'][-1]['Message']
+
+
+            embed=discord.Embed(title=f"{player} lastest stats", color=0x021ff7)
+            embed.set_author(name="RLBot")
+            embed.add_field(name="**Feed**",
+                                value=f"{mode0} \nMMR: {mmr0} \nMMR Change: {change0} \nMessage: {message0}\n\n" \
+                                    + f"{mode1} \nMMR: {mmr1} \nMMR Change: {change1} \nMessage: {message1}\n\n" \
+                                    + f"{mode2} \nMMR: {mmr2} \nMMR Change: {change2} \nMessage: {message2}\n\n" \
+                                    + f"{mode3} \nMMR: {mmr3} \nMMR Change: {change3} \nMessage: {message3}\n\n" \
+                                    + f"{mode4} \nMMR: {mmr4} \nMMR Change: {change4} \nMessage: {message4}\n\n" \
+                                    + f"{mode5} \nMMR: {mmr5} \nMMR Change: {change5} \nMessage: {message5}\n\n" \
+                                    + f"{mode6} \nMMR: {mmr6} \nMMR Change: {change6} \nMessage: {message6}\n\n" \
+                                    + f"{mode7} \nMMR: {mmr7} \nMMR Change: {change7} \nMessage: {message7}\n\n" ,
+                                inline=False)
+            embed.set_footer(text="e:)")
+
+            await ctx.send(embed=embed)
+
+        except Exception as ex:
+            await ctx.send(f"Error Code: {ex}")
+
+bot.run('NzEwNTE2NjcxMTg5NzQ1Njgz.XuYhlw.1D_xxKFR6MJL-k5Fsl51JymXSec')
