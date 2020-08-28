@@ -25,6 +25,43 @@ async def on_ready():
     print(bot.user)
     print('-' * 30)
 
+@bot.command()
+async def starttwitchbot(ctx):
+    global val
+    live = []
+    val = True
+    while val == True:
+        try:
+            data = followed()
+        except (KeyError, ValueError):
+            sys.exit(1)
+        numStreams = len(data['streams'])
+        for i in range(0, numStreams):
+            name = data["streams"][i]["channel"]["name"]
+            game = data["streams"][i]["channel"]["game"]
+            status = data["streams"][i]["channel"]["status"]
+            viewers = str(data["streams"][i]["viewers"])
+            stream = data["streams"][i]["stream_type"]
+            prev = data['streams'][1]['preview']['medium']
+            logo = data['streams'][1]['channel']['logo']
+            try:
+                if name in live:
+                    pass
+                elif stream == "live":
+                    embed=discord.Embed(title=f"{name} is live", color=0x021ff7, url=f"https://twitch.tv/{name}")
+                    embed.set_author(name="RLBot", icon_url=logo)
+                    embed.set_thumbnail(url=prev)
+                    embed.add_field(name=f"**{status}**", value=f"Viewers: {viewers} \nPlaying: {game}", inline=False)
+                    embed.set_footer(text="e:)")
+                    await ctx.send(embed=embed)
+                    live.append(name)
+            except:
+                await asyncio.sleep(30)
+                live.clear()
+
+@bot.command()
+async def stoptwitchbot(ctx):
+    val = False
 
 @bot.command()
 async def add(ctx, a: float, b: float):
@@ -35,12 +72,12 @@ async def minus(ctx, a: float, b: float):
     await ctx.send(a-b)
 
 @bot.command()
-@commands.has_role('eric')
+@commands.has_role('admin')
 async def kick(ctx, member: discord.Member, *, reason=None):
     await member.kick(reason=reason)
 
 @bot.command()
-@commands.has_role('eric')
+@commands.has_role('admin')
 async def ban(ctx, member: discord.Member, *, reason=None):
     await member.ban(reason=reason)
     await ctx.send(f'Banned {member.mention}')
@@ -48,7 +85,7 @@ async def ban(ctx, member: discord.Member, *, reason=None):
     await ctx.channel.purge(limit=1)
 
 @bot.command()
-@commands.has_role('eric')
+@commands.has_role('admin')
 async def unban(ctx, *, member):
     banned_users = await ctx.guild.bans()
     member_name, member_discriminator = member.split('#')
@@ -64,17 +101,17 @@ async def unban(ctx, *, member):
 
 @bot.event
 async def on_member_join(member):
-    channel = bot.get_channel(694810432359235604)
+    channel = bot.get_channel(724820415293423686)
     await channel.send(f'{member.mention} has joined.')
 
 
 @bot.event
 async def on_member_remove(member):
-    channel = bot.get_channel(694810432359235604)
+    channel = bot.get_channel(724820415293423686)
     await channel.send(f'{member.mention} has left the server.')
 
 @bot.command()
-@commands.has_role('eric')
+@commands.has_role('admin')
 async def clear(ctx, amount: int):
     await ctx.channel.purge(limit=amount)
 
@@ -113,77 +150,141 @@ async def _8ball(ctx, *, question):
     await asyncio.sleep(2)
     await ctx.send(f'{random.choice(responses)}')
 
+def getid(streamer):
+    headers = {
+               'Accept': 'application/vnd.twitchtv.v5+json',
+               'Client-ID': 'qi3zqqr8r1rlrip1zlkwghx2iyxm5v',
+               'Authorization': 'OAuth c5dbysxbjylvf0kosg0998zdbyq0pv',
+               }
+    try:
+        response = requests.get(f'https://api.twitch.tv/kraken/users?login={streamer}', headers=headers)
+        data = response.json()
+    except (KeyError, ValueError):
+        sys.exit(1)
+    id = data["users"][0]["_id"]
+    return id
+
+def followed():
+    headers = {
+               'Accept': 'application/vnd.twitchtv.v5+json',
+               'Client-ID': 'qi3zqqr8r1rlrip1zlkwghx2iyxm5v',
+               'Authorization': 'OAuth c5dbysxbjylvf0kosg0998zdbyq0pv',
+               }
+    try:
+        response = requests.get('https://api.twitch.tv/kraken/streams/followed', headers=headers)
+        data = response.json()
+    except (KeyError, ValueError):
+        sys.exit(1)
+    return data
+
+def follow(target):
+    headers = {
+               'Accept': 'application/vnd.twitchtv.v5+json',
+               'Client-ID': 'qi3zqqr8r1rlrip1zlkwghx2iyxm5v',
+               'Authorization': 'OAuth 6iea3qukkeoc8kwnac9143a7l688ob',
+               }
+
+    mine = getid("virtuetwitchbot")
+    h = getid(target)
+    try:
+        response = requests.put(f'https://api.twitch.tv/kraken/users/{mine}/follows/channels/{h}', headers=headers)
+        data = response.json()
+    except (KeyError, ValueError):
+        sys.exit(1)
+
+@bot.command(aliases=['addstreamer', 'addtwitch'])
+async def addst(ctx, streamer):
+        try:
+            follow(streamer)
+            await ctx.send(f'Successfully followed {streamer}')
+        except:
+            await ctx.send(f'Failed to follo {streamer}')
+
+
 @bot.command()
 async def help(ctx):
 
         embed = discord.Embed(title="RLBot help", colour=discord.Colour(0x1406EF))
         embed.set_footer(text="e:)")
-        embed.add_field(name="**$Rank** (Check all ranks)", value="Rank Steam {ID}\nRank PS4 {PSN}\nRank XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Feed** (Latest Stats)", value="Feed Steam {ID}\nFeed PS4 {PSN}\nFeed XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Duel** (Check 1v1 rank)", value="Duel Steam {ID}\nDuel PS4 {PSN}\nDuel XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Doubles** (Check 2v2 rank)", value="Doubles Steam {ID}\nDoubles PS4 {PSN}\nDoubles XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Standard** (Check 3v3 rank)", value="Standard Steam {ID}\nStandard PS4 {PSN}\nStandard XBOX {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Rank** (Check all ranks)", value="Rank Steam {ID}\nRank PSN {PSN}\nRank XBOX {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Duel** (Check 1v1 rank)", value="Duel Steam {ID}\nDuel PSN {PSN}\nDuel XBOX {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Doubles** (Check 2v2 rank)", value="Doubles Steam {ID}\nDoubles PSN {PSN}\nDoubles XBOX {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Standard** (Check 3v3 rank)", value="Standard Steam {ID}\nStandard PSN {PSN}\nStandard XBOX {gamertag}\n\n", inline=False)
         await ctx.send(embed=embed)
 
-def playerid(platform, player):
-    url = f'https://rocketleague.tracker.network/profile/{platform}/{player}'
-    overview_page = requests.get(url)
-    soup = BeautifulSoup(overview_page.text, 'lxml')
-    player_id = re.search(r'\d+', soup.find('i', class_='ion-record').parent['href'])[0]
-    return player_id
+def getData(platform, player):
+    url = f"https://api.tracker.gg/api/v2/rocket-league/standard/profile/{platform}/{player}"
+    header = {
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "en",
+        "referrer": "https://rocketleague.tracker.network/rocket-league/live",
+        "referrerPolicy": "no-referrer-when-downgrade"
+    }
+    data = requests.get(url, headers=header)
+    return data.json()
 
 @bot.command()
 async def rank(ctx, platform, player):
 
-    player_id = playerid(platform, player)
-    live_url = 'https://rocketleague.tracker.network/live/data'
-    data = json.dumps({'playerIds': [player_id]})
-    live_data = requests.post(live_url, data=data).json()
+    livedata = getData(platform, player)
 
     try:
-        '''Unranked'''
-        unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
+        avatar = livedata['data']['platformInfo']['avatarUrl']
+        seasonReward = livedata['data']['segments'][0]['stats']['seasonRewardLevel']['metadata']['rankName']
 
-        '''Standard Ranked Modes'''
-        duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-        duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-        duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
+        duelrank = livedata['data']['segments'][2]['stats']['tier']['metadata']['name']
+        dueldiv = livedata['data']['segments'][2]['stats']['division']['metadata']['name']
+        duelstreak = livedata['data']['segments'][2]['stats']['winStreak']['displayValue']
+        duelMMR = livedata['data']['segments'][2]['stats']['rating']['value']
 
-        doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-        doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-        doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
+        doublesrank = livedata['data']['segments'][3]['stats']['tier']['metadata']['name']
+        doublesdiv = livedata['data']['segments'][3]['stats']['division']['metadata']['name']
+        doublesstreak = livedata['data']['segments'][3]['stats']['winStreak']['displayValue']
+        doublesMMR = livedata['data']['segments'][3]['stats']['rating']['value']
 
-        solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-        solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-        solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
 
-        standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-        standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-        standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
+        solostandardrank = livedata['data']['segments'][4]['stats']['tier']['metadata']['name']
+        solostandarddiv = livedata['data']['segments'][4]['stats']['division']['metadata']['name']
+        solostandardstreak = livedata['data']['segments'][4]['stats']['winStreak']['displayValue']
+        solostandardMMR = livedata['data']['segments'][4]['stats']['rating']['value']
 
-        '''Extra Modes'''
-        hoopsMMR = live_data['players'][0]['Stats'][14]['Value']['ValueInt']
-        hoopsRank = live_data['players'][0]['Stats'][14]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][14]['Other']['subtitle2']
+        standardrank = livedata['data']['segments'][5]['stats']['tier']['metadata']['name']
+        standarddiv = livedata['data']['segments'][5]['stats']['division']['metadata']['name']
+        standardstreak = livedata['data']['segments'][5]['stats']['winStreak']['displayValue']
+        standardMMR = livedata['data']['segments'][5]['stats']['rating']['value']
 
-        rumbleMMR = live_data['players'][0]['Stats'][15]['Value']['ValueInt']
-        rumbleRank = live_data['players'][0]['Stats'][15]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
+        hoopsrank = livedata['data']['segments'][6]['stats']['tier']['metadata']['name']
+        hoopsdiv = livedata['data']['segments'][6]['stats']['division']['metadata']['name']
+        hoopsstreak = livedata['data']['segments'][6]['stats']['winStreak']['displayValue']
+        hoopsMMR = livedata['data']['segments'][6]['stats']['rating']['value']
 
-        dropshotMMR = live_data['players'][0]['Stats'][16]['Value']['ValueInt']
-        dropshotRank = live_data['players'][0]['Stats'][16]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
+        rumblerank = livedata['data']['segments'][7]['stats']['tier']['metadata']['name']
+        rumblediv = livedata['data']['segments'][7]['stats']['division']['metadata']['name']
+        rumblestreak = livedata['data']['segments'][7]['stats']['winStreak']['displayValue']
+        rumbleMMR = livedata['data']['segments'][7]['stats']['rating']['value']
 
-        snowdayMMR = live_data['players'][0]['Stats'][17]['Value']['ValueInt']
-        snowdayRank = live_data['players'][0]['Stats'][17]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
+        dropshotrank = livedata['data']['segments'][8]['stats']['tier']['metadata']['name']
+        dropshotdiv = livedata['data']['segments'][8]['stats']['division']['metadata']['name']
+        dropshotstreak = livedata['data']['segments'][8]['stats']['winStreak']['displayValue']
+        dropshotMMR = livedata['data']['segments'][8]['stats']['rating']['value']
+
+        snowdayrank = livedata['data']['segments'][9]['stats']['tier']['metadata']['name']
+        snowdaydiv = livedata['data']['segments'][9]['stats']['division']['metadata']['name']
+        snowdaystreak = livedata['data']['segments'][9]['stats']['winStreak']['displayValue']
+        snowdayMMR = livedata['data']['segments'][9]['stats']['rating']['value']
 
         embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
         embed.set_author(name="RLBot")
-        embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
-        embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
-        embed.add_field(name="**Standard**", value=f"{standardRank} \nMMR: {standardMMR} \nStreak: {standardStreak}", inline=False)
-        embed.add_field(name="**Solo Standard**", value=f"{solostandardRank} \nMMR: {solostandardMMR} \nStreak: {solostandardStreak}", inline=False)
-        embed.add_field(name="**Hoops**", value=f"{hoopsRank} \nMMR: {hoopsMMR}", inline=False)
-        embed.add_field(name="**Rumble**", value=f"{rumbleRank} \nMMR: {rumbleMMR}", inline=False)
-        embed.add_field(name="**Dropshot**", value=f"{dropshotRank} \nMMR: {dropshotMMR}", inline=False)
-        embed.add_field(name="**Snowday**", value=f"{snowdayRank} \nMMR: {snowdayMMR}", inline=False)
+        embed.set_thumbnail(url=avatar)
+        embed.add_field(name="**Season Reward**", value=f"{seasonReward}", inline=False)
+        embed.add_field(name="**Duel**", value=f"{duelrank + ' ' + dueldiv} \nMMR: {duelMMR} \nStreak: {duelstreak}", inline=False)
+        embed.add_field(name="**Doubles**", value=f"{doublesrank + ' ' + doublesdiv} \nMMR: {doublesMMR} \nStreak: {doublesstreak}", inline=False)
+        embed.add_field(name="**Standard**", value=f"{standardrank + ' ' + standarddiv} \nMMR: {standardMMR} \nStreak: {standardstreak}", inline=False)
+        embed.add_field(name="**Solo Standard**", value=f"{solostandardrank + ' ' + solostandarddiv} \nMMR: {solostandardMMR} \nStreak: {solostandardstreak}", inline=False)
+        embed.add_field(name="**Hoops**", value=f"{hoopsrank + ' ' + hoopsdiv} \nMMR: {hoopsMMR}", inline=False)
+        embed.add_field(name="**Rumble**", value=f"{rumblerank + ' ' + rumblediv} \nMMR: {rumbleMMR}", inline=False)
+        embed.add_field(name="**Dropshot**", value=f"{dropshotrank + ' ' + dropshotdiv} \nMMR: {dropshotMMR}", inline=False)
+        embed.add_field(name="**Snowday**", value=f"{snowdayrank + ' ' + snowdaydiv} \nMMR: {snowdayMMR}", inline=False)
         embed.set_footer(text="e:)")
 
         await ctx.send(embed=embed)
@@ -192,31 +293,37 @@ async def rank(ctx, platform, player):
 
         try:
 
-            '''Unranked'''
-            unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
+            avatar = livedata['data']['platformInfo']['avatarUrl']
+            seasonReward = livedata['data']['segments'][0]['stats']['seasonRewardLevel']['metadata']['rankName']
 
-            '''Standard Ranked Modes'''
-            duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-            duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-            duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
+            duelrank = livedata['data']['segments'][2]['stats']['tier']['metadata']['name']
+            dueldiv = livedata['data']['segments'][2]['stats']['division']['metadata']['name']
+            duelstreak = livedata['data']['segments'][2]['stats']['winStreak']['displayValue']
+            duelMMR = livedata['data']['segments'][2]['stats']['rating']['value']
 
-            doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-            doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-            doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
+            doublesrank = livedata['data']['segments'][3]['stats']['tier']['metadata']['name']
+            doublesdiv = livedata['data']['segments'][3]['stats']['division']['metadata']['name']
+            doublesstreak = livedata['data']['segments'][3]['stats']['winStreak']['displayValue']
+            doublesMMR = livedata['data']['segments'][3]['stats']['rating']['value']
 
-            solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-            solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-            solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
 
-            standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-            standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-            standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
+            solostandardrank = livedata['data']['segments'][4]['stats']['tier']['metadata']['name']
+            solostandarddiv = livedata['data']['segments'][4]['stats']['division']['metadata']['name']
+            solostandardstreak = livedata['data']['segments'][4]['stats']['winStreak']['displayValue']
+            solostandardMMR = livedata['data']['segments'][4]['stats']['rating']['value']
+
+            standardrank = livedata['data']['segments'][5]['stats']['tier']['metadata']['name']
+            standarddiv = livedata['data']['segments'][5]['stats']['division']['metadata']['name']
+            standardstreak = livedata['data']['segments'][5]['stats']['winStreak']['displayValue']
+            standardMMR = livedata['data']['segments'][5]['stats']['rating']['value']
 
             embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
             embed.set_author(name="RLBot")
-            embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
-            embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
-            embed.add_field(name="**Standard**", value=f"{solostandardRank} \nMMR: {solostandardMMR} \nStreak: {solostandardStreak}", inline=False)
+            embed.set_thumbnail(url=avatar)
+            embed.add_field(name="**Season Reward**", value=f"{seasonReward}", inline=False)
+            embed.add_field(name="**Duel**", value=f"{duelrank + ' ' + dueldiv} \nMMR: {duelMMR} \nStreak: {duelstreak}", inline=False)
+            embed.add_field(name="**Doubles**", value=f"{doublesrank + ' ' + doublesdiv} \nMMR: {doublesMMR} \nStreak: {doublesstreak}", inline=False)
+            embed.add_field(name="**Standard**", value=f"{standardrank + ' ' + standarddiv} \nMMR: {standardMMR} \nStreak: {standardstreak}", inline=False)
             embed.set_footer(text="e:)")
 
             await ctx.send(embed=embed)
@@ -227,366 +334,110 @@ async def rank(ctx, platform, player):
 @bot.command()
 async def duel(ctx, platform, player):
 
-    player_id = playerid(platform, player)
-    live_url = 'https://rocketleague.tracker.network/live/data'
-    data = json.dumps({'playerIds': [player_id]})
-    live_data = requests.post(live_url, data=data).json()
+    livedata = getData(platform, player)
+    avatar = livedata['data']['platformInfo']['avatarUrl']
+    seasonReward = livedata['data']['segments'][0]['stats']['seasonRewardLevel']['metadata']['rankName']
 
-    try:
-        '''Unranked'''
-        unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
+    duelrank = livedata['data']['segments'][2]['stats']['tier']['metadata']['name']
+    dueldiv = livedata['data']['segments'][2]['stats']['division']['metadata']['name']
+    duelstreak = livedata['data']['segments'][2]['stats']['winStreak']['displayValue']
+    duelMMR = livedata['data']['segments'][2]['stats']['rating']['value']
 
-        '''Standard Ranked Modes'''
-        duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-        duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-        duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
+    doublesrank = livedata['data']['segments'][3]['stats']['tier']['metadata']['name']
+    doublesdiv = livedata['data']['segments'][3]['stats']['division']['metadata']['name']
+    doublesstreak = livedata['data']['segments'][3]['stats']['winStreak']['displayValue']
+    doublesMMR = livedata['data']['segments'][3]['stats']['rating']['value']
 
-        doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-        doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-        doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
 
-        solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-        solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-        solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
+    solostandardrank = livedata['data']['segments'][4]['stats']['tier']['metadata']['name']
+    solostandarddiv = livedata['data']['segments'][4]['stats']['division']['metadata']['name']
+    solostandardstreak = livedata['data']['segments'][4]['stats']['winStreak']['displayValue']
+    solostandardMMR = livedata['data']['segments'][4]['stats']['rating']['value']
 
-        standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-        standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-        standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
+    standardrank = livedata['data']['segments'][5]['stats']['tier']['metadata']['name']
+    standarddiv = livedata['data']['segments'][5]['stats']['division']['metadata']['name']
+    standardstreak = livedata['data']['segments'][5]['stats']['winStreak']['displayValue']
+    standardMMR = livedata['data']['segments'][5]['stats']['rating']['value']
 
-        '''Extra Modes'''
-        hoopsMMR = live_data['players'][0]['Stats'][14]['Value']['ValueInt']
-        hoopsRank = live_data['players'][0]['Stats'][14]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][14]['Other']['subtitle2']
+    embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
+    embed.set_author(name="RLBot")
+    embed.set_thumbnail(url=avatar)
+    embed.add_field(name="**Duel**", value=f"{duelrank + ' ' + dueldiv} \nMMR: {duelMMR} \nStreak: {duelstreak}", inline=False)
+    embed.set_footer(text="e:)")
 
-        rumbleMMR = live_data['players'][0]['Stats'][15]['Value']['ValueInt']
-        rumbleRank = live_data['players'][0]['Stats'][15]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
+    await ctx.send(embed=embed)
 
-        dropshotMMR = live_data['players'][0]['Stats'][16]['Value']['ValueInt']
-        dropshotRank = live_data['players'][0]['Stats'][16]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        snowdayMMR = live_data['players'][0]['Stats'][17]['Value']['ValueInt']
-        snowdayRank = live_data['players'][0]['Stats'][17]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        embed=discord.Embed(title=f"{player} Duel Rank", color=0x021ff7)
-        embed.set_author(name="RLBot")
-        embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
-        embed.set_footer(text="e:)")
-
-        await ctx.send(embed=embed)
-
-    except:
-
-        try:
-
-            '''Unranked'''
-            unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
-
-            '''Standard Ranked Modes'''
-            duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-            duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-            duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
-
-            doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-            doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-            doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
-
-            solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-            solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-            solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
-
-            standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-            standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-            standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
-
-            embed=discord.Embed(title=f"{player} Duel Rank", color=0x021ff7)
-            embed.set_author(name="RLBot")
-            embed.add_field(name="**Duel**", value=f"{duelRank} \nMMR: {duelMMR} \nStreak: {duelStreak}", inline=False)
-            embed.set_footer(text="e:)")
-
-            await ctx.send(embed=embed)
-
-        except Exception as ex:
-            await ctx.send(f"Error Code: {ex}")
 
 @bot.command()
 async def doubles(ctx, platform, player):
 
-    player_id = playerid(platform, player)
-    live_url = 'https://rocketleague.tracker.network/live/data'
-    data = json.dumps({'playerIds': [player_id]})
-    live_data = requests.post(live_url, data=data).json()
+    livedata = getData(platform, player)
+    avatar = livedata['data']['platformInfo']['avatarUrl']
+    seasonReward = livedata['data']['segments'][0]['stats']['seasonRewardLevel']['metadata']['rankName']
 
-    try:
-        '''Unranked'''
-        unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
+    duelrank = livedata['data']['segments'][2]['stats']['tier']['metadata']['name']
+    dueldiv = livedata['data']['segments'][2]['stats']['division']['metadata']['name']
+    duelstreak = livedata['data']['segments'][2]['stats']['winStreak']['displayValue']
+    duelMMR = livedata['data']['segments'][2]['stats']['rating']['value']
 
-        '''Standard Ranked Modes'''
-        duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-        duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-        duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
+    doublesrank = livedata['data']['segments'][3]['stats']['tier']['metadata']['name']
+    doublesdiv = livedata['data']['segments'][3]['stats']['division']['metadata']['name']
+    doublesstreak = livedata['data']['segments'][3]['stats']['winStreak']['displayValue']
+    doublesMMR = livedata['data']['segments'][3]['stats']['rating']['value']
 
-        doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-        doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-        doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
 
-        solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-        solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-        solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
+    solostandardrank = livedata['data']['segments'][4]['stats']['tier']['metadata']['name']
+    solostandarddiv = livedata['data']['segments'][4]['stats']['division']['metadata']['name']
+    solostandardstreak = livedata['data']['segments'][4]['stats']['winStreak']['displayValue']
+    solostandardMMR = livedata['data']['segments'][4]['stats']['rating']['value']
 
-        standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-        standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-        standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
+    standardrank = livedata['data']['segments'][5]['stats']['tier']['metadata']['name']
+    standarddiv = livedata['data']['segments'][5]['stats']['division']['metadata']['name']
+    standardstreak = livedata['data']['segments'][5]['stats']['winStreak']['displayValue']
+    standardMMR = livedata['data']['segments'][5]['stats']['rating']['value']
 
-        '''Extra Modes'''
-        hoopsMMR = live_data['players'][0]['Stats'][14]['Value']['ValueInt']
-        hoopsRank = live_data['players'][0]['Stats'][14]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][14]['Other']['subtitle2']
+    embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
+    embed.set_author(name="RLBot")
+    embed.set_thumbnail(url=avatar)
+    embed.add_field(name="**Doubles**", value=f"{doublesrank + ' ' + doublesdiv} \nMMR: {doublesMMR} \nStreak: {doublesstreak}", inline=False)
+    embed.set_footer(text="e:)")
 
-        rumbleMMR = live_data['players'][0]['Stats'][15]['Value']['ValueInt']
-        rumbleRank = live_data['players'][0]['Stats'][15]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        dropshotMMR = live_data['players'][0]['Stats'][16]['Value']['ValueInt']
-        dropshotRank = live_data['players'][0]['Stats'][16]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        snowdayMMR = live_data['players'][0]['Stats'][17]['Value']['ValueInt']
-        snowdayRank = live_data['players'][0]['Stats'][17]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        embed=discord.Embed(title=f"{player} Doubles Rank", color=0x021ff7)
-        embed.set_author(name="RLBot")
-        embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
-        embed.set_footer(text="e:)")
-
-        await ctx.send(embed=embed)
-
-    except:
-
-        try:
-
-            '''Unranked'''
-            unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
-
-            '''Standard Ranked Modes'''
-            duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-            duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-            duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
-
-            doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-            doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-            doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
-
-            solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-            solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-            solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
-
-            standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-            standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-            standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
-
-            embed=discord.Embed(title=f"{player} Doubles Rank", color=0x021ff7)
-            embed.set_author(name="RLBot")
-            embed.add_field(name="**Doubles**", value=f"{doublesRank} \nMMR: {doublesMMR} \nStreak: {doublesStreak}", inline=False)
-            embed.set_footer(text="e:)")
-
-            await ctx.send(embed=embed)
-
-        except Exception as ex:
-            await ctx.send(f"Error Code: {ex}")
+    await ctx.send(embed=embed)
 
 @bot.command()
 async def standard(ctx, platform, player):
+    livedata = getData(platform, player)
+    avatar = livedata['data']['platformInfo']['avatarUrl']
+    seasonReward = livedata['data']['segments'][0]['stats']['seasonRewardLevel']['metadata']['rankName']
 
-    player_id = playerid(platform, player)
-    live_url = 'https://rocketleague.tracker.network/live/data'
-    data = json.dumps({'playerIds': [player_id]})
-    live_data = requests.post(live_url, data=data).json()
+    duelrank = livedata['data']['segments'][2]['stats']['tier']['metadata']['name']
+    dueldiv = livedata['data']['segments'][2]['stats']['division']['metadata']['name']
+    duelstreak = livedata['data']['segments'][2]['stats']['winStreak']['displayValue']
+    duelMMR = livedata['data']['segments'][2]['stats']['rating']['value']
 
-    try:
-        '''Unranked'''
-        unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
-
-        '''Standard Ranked Modes'''
-        duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-        duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-        duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
-
-        doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-        doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-        doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
-
-        solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-        solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-        solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
-
-        standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-        standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-        standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
-
-        '''Extra Modes'''
-        hoopsMMR = live_data['players'][0]['Stats'][14]['Value']['ValueInt']
-        hoopsRank = live_data['players'][0]['Stats'][14]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][14]['Other']['subtitle2']
-
-        rumbleMMR = live_data['players'][0]['Stats'][15]['Value']['ValueInt']
-        rumbleRank = live_data['players'][0]['Stats'][15]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        dropshotMMR = live_data['players'][0]['Stats'][16]['Value']['ValueInt']
-        dropshotRank = live_data['players'][0]['Stats'][16]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        snowdayMMR = live_data['players'][0]['Stats'][17]['Value']['ValueInt']
-        snowdayRank = live_data['players'][0]['Stats'][17]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][15]['Other']['subtitle2']
-
-        embed=discord.Embed(title=f"{player} Standard Rank", color=0x021ff7)
-        embed.set_author(name="RLBot")
-        embed.add_field(name="**Standard**", value=f"{standardRank} \nMMR: {standardMMR} \nStreak: {standardStreak}", inline=False)
-        embed.set_footer(text="e:)")
-
-        await ctx.send(embed=embed)
-
-    except:
-
-        try:
-
-            '''Unranked'''
-            unrankedMMR = live_data['players'][0]['Stats'][0]['Value']['ValueInt']
-
-            '''Standard Ranked Modes'''
-            duelMMR = live_data['players'][0]['Stats'][10]['Value']['ValueInt']
-            duelRank = live_data['players'][0]['Stats'][10]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][10]['Other']['subtitle2']
-            duelStreak = live_data['players'][0]['Stats'][10]['Other']['winstreak']
-
-            doublesMMR = live_data['players'][0]['Stats'][11]['Value']['ValueInt']
-            doublesRank = live_data['players'][0]['Stats'][11]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][11]['Other']['subtitle2']
-            doublesStreak = live_data['players'][0]['Stats'][11]['Other']['winstreak']
-
-            solostandardMMR = live_data['players'][0]['Stats'][12]['Value']['ValueInt']
-            solostandardRank = live_data['players'][0]['Stats'][12]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][12]['Other']['subtitle2']
-            solostandardStreak = live_data['players'][0]['Stats'][12]['Other']['winstreak']
-
-            standardMMR = live_data['players'][0]['Stats'][13]['Value']['ValueInt']
-            standardRank =  live_data['players'][0]['Stats'][13]['Other']['subtitle'] + ' ' + live_data['players'][0]['Stats'][13]['Other']['subtitle2']
-            standardStreak = live_data['players'][0]['Stats'][13]['Other']['winstreak']
-
-            embed=discord.Embed(title=f"{player} Standard Rank", color=0x021ff7)
-            embed.set_author(name="RLBot")
-            embed.add_field(name="**Standard**", value=f"{standardRank} \nMMR: {standardMMR} \nStreak: {standardStreak}", inline=False)
-            embed.set_footer(text="e:)")
-
-            await ctx.send(embed=embed)
-
-        except Exception as ex:
-            await ctx.send(f"Error Code: {ex}")
+    doublesrank = livedata['data']['segments'][3]['stats']['tier']['metadata']['name']
+    doublesdiv = livedata['data']['segments'][3]['stats']['division']['metadata']['name']
+    doublesstreak = livedata['data']['segments'][3]['stats']['winStreak']['displayValue']
+    doublesMMR = livedata['data']['segments'][3]['stats']['rating']['value']
 
 
-@bot.command()
-async def feed(ctx, platform, player):
+    solostandardrank = livedata['data']['segments'][4]['stats']['tier']['metadata']['name']
+    solostandarddiv = livedata['data']['segments'][4]['stats']['division']['metadata']['name']
+    solostandardstreak = livedata['data']['segments'][4]['stats']['winStreak']['displayValue']
+    solostandardMMR = livedata['data']['segments'][4]['stats']['rating']['value']
 
-    player_id = playerid(platform, player)
-    live_url = 'https://rocketleague.tracker.network/live/data'
-    data = json.dumps({'playerIds': [player_id]})
-    live_data = requests.post(live_url, data=data).json()
+    standardrank = livedata['data']['segments'][5]['stats']['tier']['metadata']['name']
+    standarddiv = livedata['data']['segments'][5]['stats']['division']['metadata']['name']
+    standardstreak = livedata['data']['segments'][5]['stats']['winStreak']['displayValue']
+    standardMMR = livedata['data']['segments'][5]['stats']['rating']['value']
 
-    try:
+    embed=discord.Embed(title=f"{player} Ranks", color=0x021ff7)
+    embed.set_author(name="RLBot")
+    embed.set_thumbnail(url=avatar)
+    embed.add_field(name="**Duel**", value=f"{duelrank + ' ' + dueldiv} \nMMR: {duelMMR} \nStreak: {duelstreak}", inline=False)
+    embed.set_footer(text="e:)")
 
-        mode0 = live_data['feed'][0]['Changes'][-1]['Field']
-        mmr0 = live_data['feed'][0]['Changes'][-1]['Value']
-        change0 = live_data['feed'][0]['Changes'][-1]['Delta']
-        message0 = live_data['feed'][0]['Changes'][-1]['Message']
-
-
-        mode1 = live_data['feed'][1]['Changes'][-1]['Field']
-        mmr1 = live_data['feed'][1]['Changes'][-1]['Value']
-        change1 = live_data['feed'][1]['Changes'][-1]['Delta']
-        message1 = live_data['feed'][1]['Changes'][-1]['Message']
-
-        mode2 = live_data['feed'][2]['Changes'][-1]['Field']
-        mmr2 = live_data['feed'][2]['Changes'][-1]['Value']
-        change2 = live_data['feed'][2]['Changes'][-1]['Delta']
-        message2 = live_data['feed'][2]['Changes'][-1]['Message']
-
-        mode3 = live_data['feed'][3]['Changes'][-1]['Field']
-        mmr3 = live_data['feed'][3]['Changes'][-1]['Value']
-        change3 = live_data['feed'][3]['Changes'][-1]['Delta']
-        message3 = live_data['feed'][3]['Changes'][-1]['Message']
-
-        mode4 = live_data['feed'][4]['Changes'][-1]['Field']
-        mmr4 = live_data['feed'][4]['Changes'][-1]['Value']
-        change4 = live_data['feed'][4]['Changes'][-1]['Delta']
-        message4 = live_data['feed'][4]['Changes'][-1]['Message']
-
-        mode5 = live_data['feed'][5]['Changes'][-1]['Field']
-        mmr5 = live_data['feed'][5]['Changes'][-1]['Value']
-        change5 = live_data['feed'][5]['Changes'][-1]['Delta']
-        message5 = live_data['feed'][5]['Changes'][-1]['Message']
-
-        mode6 = live_data['feed'][6]['Changes'][-1]['Field']
-        mmr6 = live_data['feed'][6]['Changes'][-1]['Value']
-        change6 = live_data['feed'][6]['Changes'][-1]['Delta']
-        message6 = live_data['feed'][6]['Changes'][-1]['Message']
-
-        mode7 = live_data['feed'][7]['Changes'][-1]['Field']
-        mmr7 = live_data['feed'][7]['Changes'][-1]['Value']
-        change7 = live_data['feed'][7]['Changes'][-1]['Delta']
-        message7 = live_data['feed'][7]['Changes'][-1]['Message']
+    await ctx.send(embed=embed)
 
 
-        embed=discord.Embed(title=f"{player} Latest Stats", color=0x021ff7)
-        embed.set_author(name="RLBot")
-        embed.add_field(name="**Feed**",
-                            value=f"{mode0} \nMMR: {mmr0} \nMMR Change: {change0} \nMessage: {message0}\n\n" \
-                                + f"{mode1} \nMMR: {mmr1} \nMMR Change: {change1} \nMessage: {message1}\n\n" \
-                                + f"{mode2} \nMMR: {mmr2} \nMMR Change: {change2} \nMessage: {message2}\n\n" \
-                                + f"{mode3} \nMMR: {mmr3} \nMMR Change: {change3} \nMessage: {message3}\n\n" \
-                                + f"{mode4} \nMMR: {mmr4} \nMMR Change: {change4} \nMessage: {message4}\n\n" \
-                                + f"{mode5} \nMMR: {mmr5} \nMMR Change: {change5} \nMessage: {message5}\n\n" \
-                                + f"{mode6} \nMMR: {mmr6} \nMMR Change: {change6} \nMessage: {message6}\n\n" \
-                                + f"{mode7} \nMMR: {mmr7} \nMMR Change: {change7} \nMessage: {message7}\n\n" ,
-                            inline=False)
-        embed.set_footer(text="e:)")
-
-        await ctx.send(embed=embed)
-
-    except:
-
-        try:
-
-            mode0 = live_data['feed'][0]['Changes'][-1]['Field']
-            mmr0 = live_data['feed'][0]['Changes'][-1]['Value']
-            change0 = live_data['feed'][0]['Changes'][-1]['Delta']
-            message0 = live_data['feed'][0]['Changes'][-1]['Message']
-
-            mode1 = live_data['feed'][1]['Changes'][-1]['Field']
-            mmr1 = live_data['feed'][1]['Changes'][-1]['Value']
-            change1 = live_data['feed'][1]['Changes'][-1]['Delta']
-            message1 = live_data['feed'][1]['Changes'][-1]['Message']
-
-            mode2 = live_data['feed'][2]['Changes'][-1]['Field']
-            mmr2 = live_data['feed'][2]['Changes'][-1]['Value']
-            change2 = live_data['feed'][2]['Changes'][-1]['Delta']
-            message2 = live_data['feed'][2]['Changes'][-1]['Message']
-
-            mode3 = live_data['feed'][3]['Changes'][-1]['Field']
-            mmr3 = live_data['feed'][3]['Changes'][-1]['Value']
-            change3 = live_data['feed'][3]['Changes'][-1]['Delta']
-            message3 = live_data['feed'][3]['Changes'][-1]['Message']
-
-            mode4 = live_data['feed'][4]['Changes'][-1]['Field']
-            mmr4 = live_data['feed'][4]['Changes'][-1]['Value']
-            change4 = live_data['feed'][4]['Changes'][-1]['Delta']
-            message4 = live_data['feed'][4]['Changes'][-1]['Message']
-
-
-
-            embed=discord.Embed(title=f"{player} Latest Stats", color=0x021ff7)
-            embed.set_author(name="RLBot")
-            embed.add_field(name="**Feed**",
-                                value=f"{mode0} \nMMR: {mmr0} \nMMR Change: {change0} \nMessage: {message0}\n\n" \
-                                    + f"{mode1} \nMMR: {mmr1} \nMMR Change: {change1} \nMessage: {message1}\n\n" \
-                                    + f"{mode2} \nMMR: {mmr2} \nMMR Change: {change2} \nMessage: {message2}\n\n" \
-                                    + f"{mode3} \nMMR: {mmr3} \nMMR Change: {change3} \nMessage: {message3}\n\n" \
-                                    + f"{mode4} \nMMR: {mmr4} \nMMR Change: {change4} \nMessage: {message4}\n\n" ,
-                                inline=False)
-            embed.set_footer(text="e:)")
-
-            await ctx.send(embed=embed)
-
-        except Exception as ex:
-            await ctx.send(f"Error Code: {ex}")
-
-bot.run(TOKEN)
+bot.run('NzEwNTE2NjcxMTg5NzQ1Njgz.Xr1mNw.tWI69GMw35RcTPId1Cj5-gxyf14')
