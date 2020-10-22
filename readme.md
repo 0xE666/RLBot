@@ -12,27 +12,27 @@ https://i.imgur.com/1x460sM.png
 
 
 
-$Rank Command:
-$Rank Steam {Steam ID}
-$Rank XBL {Gamertag}
-$Rank PSN {PSN}
-
-$Duel Command:
-$Duel Steam {Steam ID}
-$Duel XBL {Gamertag}
-$Duel PSN {PSN}
-
-$Doubles Command:
-$Doubles Steam {Steam ID}
-$Doubles XBL {Gamertag}
-$Doubles PSN {PSN}
-
-$Standard Command:
-$Standard Steam {Steam ID}
-$Standard XBL {Gamertag}
-$Standard PSN {PSN}
-
-$Tourney Command:
-$Tourney Steam {Steam ID}
-$Tourney XBL {Gamertag}
-$Tourney PSN {PSN}
+$Rank Command:&nbsp;
+$Rank Steam {Steam ID}&nbsp;
+$Rank XBL {Gamertag}&nbsp;
+$Rank PSN {PSN}&nbsp;
+&nbsp;
+$Duel Command:&nbsp;
+$Duel Steam {Steam ID}&nbsp;
+$Duel XBL {Gamertag}&nbsp;
+$Duel PSN {PSN}&nbsp;
+&nbsp;
+$Doubles Command:&nbsp;
+$Doubles Steam {Steam ID}&nbsp;
+$Doubles XBL {Gamertag}&nbsp;
+$Doubles PSN {PSN}&nbsp;
+&nbsp;
+$Standard Command:&nbsp;
+$Standard Steam {Steam ID}&nbsp;
+$Standard XBL {Gamertag}&nbsp;
+$Standard PSN {PSN}&nbsp;
+&nbsp;
+$Tourney Command:&nbsp;
+$Tourney Steam {Steam ID}&nbsp;
+$Tourney XBL {Gamertag}&nbsp;
+$Tourney PSN {PSN}&nbsp;
