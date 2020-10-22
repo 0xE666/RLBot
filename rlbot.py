@@ -31,12 +31,11 @@ async def help(ctx):
 
         embed = discord.Embed(title="RLBot help", colour=discord.Colour(0x1406EF))
         embed.set_footer(text="e:)")
-        embed.add_field(name="**$Rank** (Check all ranks)", value="Rank Steam {ID}\nRank PSN {PSN}\nRank XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Feed** (check recent matches)", value="Feed Steam {ID}\nFeed PSN {PSN}\nFeed XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Duel** (Check 1v1 rank)", value="Duel Steam {ID}\nDuel PSN {PSN}\nDuel XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Doubles** (Check 2v2 rank)", value="Doubles Steam {ID}\nDoubles PSN {PSN}\nDoubles XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Standard** (Check 3v3 rank)", value="Standard Steam {ID}\nStandard PSN {PSN}\nStandard XBOX {gamertag}\n\n", inline=False)
-        embed.add_field(name="**$Tourney** (Check Tournament rank)", value="Tourney Steam {ID}\nTourney PSN {PSN}\nTourney XBOX {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Rank** (Check all ranks)", value="Rank Steam {ID}\nRank PSN {PSN}\nRank XBL {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Duel** (Check 1v1 rank)", value="Duel Steam {ID}\nDuel PSN {PSN}\nDuel XBL {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Doubles** (Check 2v2 rank)", value="Doubles Steam {ID}\nDoubles PSN {PSN}\nDoubles XBL {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Standard** (Check 3v3 rank)", value="Standard Steam {ID}\nStandard PSN {PSN}\nStandard XBL {gamertag}\n\n", inline=False)
+        embed.add_field(name="**$Tourney** (Check Tournament rank)", value="Tourney Steam {ID}\nTourney PSN {PSN}\nTourney XBL {gamertag}\n\n", inline=False)
         await ctx.send(embed=embed)
 
 def getData(platform, player):
@@ -251,4 +250,4 @@ async def tourney(ctx, platform, player):
     await ctx.send(embed=embed)
 
 
-bot.run('NzEwNTE2NjcxMTg5NzQ1Njgz.Xr1mNw.tJTerhfqAUt8oebMv2Hzz3S7eiU')
+bot.run('DISCORD TOKEN')
