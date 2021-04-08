@@ -4,8 +4,6 @@ UPDATED TO SEASON 3 AND EPIC SEARCHES
 <br>
 it uses Tracker.gg (http://rocketleague.tracker.network/) unofficial api
 <br>
-updated to tournaments update
-<br>
 if you dont know how to run a discord bot in python at this point you shouldnt be downloading this.
 <br>
 <br>
