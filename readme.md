@@ -1,5 +1,7 @@
 This is a little project i was working on for a discord stat bot for rocket league
 <br>
+UPDATED TO SEASON 3 AND EPIC SEARCHES
+<br>
 it uses Tracker.gg (http://rocketleague.tracker.network/) unofficial api
 <br>
 updated to tournaments update
